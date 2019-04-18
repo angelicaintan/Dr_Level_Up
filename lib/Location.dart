@@ -6,6 +6,7 @@ import 'helplocation.dart';
 import 'patientinfo1.dart';
 import 'main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'userfile.dart';
 
 class Location extends StatefulWidget {
   @override
@@ -40,6 +41,10 @@ class _LocationState extends State<Location> {
    _persistLocation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('location', location);
+  }
+
+  void _saveLocation(UserFile userfile) async {
+    userfile.records[userfile.numrecords-1].location = location;
   }
 
   @override
@@ -123,7 +128,7 @@ class _LocationState extends State<Location> {
                     context,
                     MaterialPageRoute(builder: (context) => PatientInfo1()),
                   );
-                  _persistLocation();
+                  _saveLocation(LevelUpWidget.of(context).userfile);
                 },
               ),
               Padding(

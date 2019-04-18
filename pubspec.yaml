@@ -27,6 +27,9 @@ dependencies:
   cloud_firestore: ^0.9.7
   image_picker: ^0.5.0+9
   intl: ^0.15.7
+  flutter_localizations:
+    sdk: flutter
+  rxdart: ^0.21.0
 
 
 dev_dependencies:
@@ -57,6 +60,8 @@ flutter:
    - assets/images/Slide7.PNG
    - assets/images/Slide8.PNG
    - assets/images/icon@2x.png
+   - locale/i18n_en.json
+   - locale/i18n_hk.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

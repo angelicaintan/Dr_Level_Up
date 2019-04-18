@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 import 'Location.dart';
 import 'package:intl/intl.dart';
+import 'userfile.dart';
 
 class PatientInfo1 extends StatefulWidget {
   @override
@@ -19,11 +20,12 @@ class _PatientInfo1State extends State<PatientInfo1> {
   }
 
   String name;
+  String description;
   String contact;
   bool cssa;
   String hkid;
   String gender;
-  String birthday = ' ';
+  String dob = ' ';
   String agestring;
   int age;
   bool reject = false;
@@ -75,7 +77,7 @@ class _PatientInfo1State extends State<PatientInfo1> {
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
-        birthday = DateFormat('yyyy-MM-dd').format(selectedDate);
+        dob = DateFormat('yyyy-MM-dd').format(selectedDate);
         agefull = ((dateNow.year + (dateNow.month / 12)) -
                 (selectedDate.year + (selectedDate.month / 12)))
             .toDouble();
@@ -89,20 +91,33 @@ class _PatientInfo1State extends State<PatientInfo1> {
   _persistPatientInfo1() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('name', name);
+    prefs.setString('description', description);
     prefs.setString('gender', gender);
     prefs.setString('contact', contact);
     prefs.setBool('cssa', cssa);
     prefs.setString('HKID', hkid);
-    prefs.setString('birthday', birthday);
+    prefs.setString('birthday', dob);
     prefs.setString('age', agestring);
     prefs.setBool('reject', reject);
   }
 
+  void _savePatientInfo1(UserFile userfile) {
+    userfile.records[userfile.numrecords-1].name = name;
+    userfile.records[userfile.numrecords-1].description = description;
+    userfile.records[userfile.numrecords-1].gender = gender;
+    userfile.records[userfile.numrecords-1].contact = contact;
+    userfile.records[userfile.numrecords-1].hkid = hkid;
+    userfile.records[userfile.numrecords-1].cssa = cssa;
+    userfile.records[userfile.numrecords-1].dob = dob;
+    userfile.records[userfile.numrecords-1].age = agestring;
+    userfile.records[userfile.numrecords-1].reject = reject;
+  }
   _printLatestValue() {
     print(age);
   }
 
   final nameController = TextEditingController();
+  final descController = TextEditingController();
   final contactController = TextEditingController();
   final hkidController = TextEditingController();
   final ageController = TextEditingController();
@@ -146,7 +161,7 @@ class _PatientInfo1State extends State<PatientInfo1> {
               children: <Widget>[
                 Padding(
                   padding:
-                      EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 5),
+                      EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 10),
                   child: TextField(
                     controller: nameController,
                     onChanged: (text) {
@@ -155,6 +170,22 @@ class _PatientInfo1State extends State<PatientInfo1> {
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                         labelText: 'Name',
+                        labelStyle: TextStyle(fontSize: 16),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8))),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      EdgeInsets.only(left: 24, right: 24, bottom: 5),
+                  child: TextField(
+                    controller: descController,
+                    onChanged: (text) {
+                      description = text;
+                    },
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                        labelText: 'Description',
                         labelStyle: TextStyle(fontSize: 16),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8))),
@@ -255,7 +286,7 @@ class _PatientInfo1State extends State<PatientInfo1> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Text(birthday, style: TextStyle(fontSize: 16)),
+                  child: Text(dob, style: TextStyle(fontSize: 16)),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 24, left: 24, right: 24),
@@ -310,7 +341,7 @@ class _PatientInfo1State extends State<PatientInfo1> {
                           MaterialPageRoute(
                               builder: (context) => PatientInfo2()),
                         );
-                        _persistPatientInfo1();
+                        _savePatientInfo1(LevelUpWidget.of(context).userfile);
                       },
                     ),
                   ],

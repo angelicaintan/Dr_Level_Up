@@ -6,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'logout.dart';
 import 'newrecord.dart';
+import 'userfile.dart';
+import 'main.dart';
 
 class Confirmation extends StatefulWidget {
   @override
@@ -13,8 +15,77 @@ class Confirmation extends StatefulWidget {
 }
 
 class _ConfirmationState extends State<Confirmation> {
-  var records = Firestore.instance.collection('Records').document();
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text("Send and log out?"),
+          content:
+              new Text("You can't edit the records anymore after sending."),
+          actions: <Widget>[
+            new FlatButton(
+                child: Text("logout"),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LogOut()),
+                  );
+                }),
+            new FlatButton(
+              child: Text("cancel"),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  var firestoreRecords = Firestore.instance.collection('Records').document();
+
+  void _createNewRecord(UserFile userfile) {
+    userfile.records.add(new Record('n/a','n/a','n/a','n/a','n/a','n/a', false, 'n/a', 'n/a', false, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', false, false, false, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'));
+    ++userfile.numrecords;
+  }
+
+  Future<Null> _saveRecord(UserFile userfile) async {
+    for (int i = 0; i < userfile.numrecords; i++) {
+      Map<String, dynamic> recordMap = {
+        'a. access-code': userfile.accesscode,
+        'b. user-name': userfile.username,
+        'c. email': userfile.email,
+        'd. location': userfile.records[i].location,
+        'e. name': userfile.records[i].name,
+        'f. description': userfile.records[i].description,
+        'g. gender': userfile.records[i].gender,
+        'h. contact': userfile.records[i].contact,
+        'i. HKID': userfile.records[i].hkid,
+        'j. CSSA': userfile.records[i].cssa,
+        'k. date-of-birth': userfile.records[i].dob,
+        'l. age': userfile.records[i].age,
+        'm. reject:': userfile.records[i].reject,
+        'n. heart-rate': userfile.records[i].location,
+        'o. blood-pressure': userfile.records[i].bloodpressure,
+        'p. blood-glucose': userfile.records[i].bloodglucose,
+        'q. body-height': userfile.records[i].bodyheight,
+        'r. body-weight': userfile.records[i].bodyweight,
+        's. bmi': userfile.records[i].bmi,
+        't. respiration-rate': userfile.records[i].respirationrate,
+        'u. smoking': userfile.records[i].smoking,
+        'v. alcohol': userfile.records[i].alcohol,
+        'w. drugs': userfile.records[i].drugs,
+        'x. additional-info1': userfile.records[i].additionalinfo1,
+        'y. wound': userfile.records[i].wound,
+        'z. mental-issues': userfile.records[i].mentalissues,
+        'za. past-med-records': userfile.records[i].previousmedicalrecords,
+        'zb. additional-info2': userfile.records[i].additionalinfo2,
+      };
+      firestoreRecords.setData(recordMap);
+    }
+  }
+
+/*
   Future<Null> _saveRecord() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, dynamic> recordMap = {
@@ -30,18 +101,18 @@ class _ConfirmationState extends State<Confirmation> {
       'j. birthday': prefs.getString('birthday') ?? 0,
       'k. age': prefs.getString('age') ?? 0,
       'l. reject:': prefs.getBool('reject') ?? 0,
-      'm. good_appetite:': prefs.getBool('good_appetite') ?? 0,
-      'n. good_sleep:': prefs.getBool('good_sleep') ?? 0,
-      'o. do_exercise:': prefs.getBool('do_exercise') ?? 0,
-      'p. have_routine:': prefs.getBool('have_routine') ?? 0,
-      'q. have_livingcompany:': prefs.getBool('have_routine') ?? 0,
-      'r. good_mood:': prefs.getBool('have_routine') ?? 0,
-      's. good_bowelmovement:': prefs.getBool('have_routine') ?? 0,
-      't. manage_disease:': prefs.getBool('have_routine') ?? 0,
+      'm. appetite_problems:': prefs.getBool('appetite_problems') ?? 0,
+      'n. sleep_problems:': prefs.getBool('sleep_problems') ?? 0,
+      'o. weight_problems:': prefs.getBool('weight_problems') ?? 0,
+      'p. no_routine:': prefs.getBool('no_routine') ?? 0,
+      'q. lives_alone:': prefs.getBool('lives_alone') ?? 0,
+      'r. mood_problems:': prefs.getBool('mood_problems') ?? 0,
+      's. constipation:': prefs.getBool('constipation') ?? 0,
+      't. untreated_disease:': prefs.getBool('untreated_disease') ?? 0,
       'u. heart-rate': prefs.getString('heart-rate') ?? 0,
       'v. blood-pressure': prefs.getString('blood-pressure') ?? 0,
       'w. blood-glucose': prefs.getString('blood-glucose') ?? 0,
-      'x. body-height': prefs.getString('body-height') ?? 0,
+      'x. body-height': prefs.getString('\0body-height') ?? 0,
       'y. body-weight': prefs.getString('body-weight') ?? 0,
       'z. bmi': prefs.getString('BMI') ?? 0,
       'za. respiration-rate': prefs.getString('respiration-rate') ?? 0,
@@ -56,22 +127,26 @@ class _ConfirmationState extends State<Confirmation> {
     };
     records.setData(recordMap);
   }
+  */
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Your Files'), leading: Container(), actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.help_outline, size: 29),
-            color: Colors.white,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HelpConfirmation()),
-              );
-            },
-          ),
-        ]),
+        appBar: AppBar(
+            title: Text('Your Files'),
+            leading: Container(),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.help_outline, size: 29),
+                color: Colors.white,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HelpConfirmation()),
+                  );
+                },
+              ),
+            ]),
         body: ListView(
           children: <Widget>[
             Column(
@@ -83,26 +158,34 @@ class _ConfirmationState extends State<Confirmation> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
+                        /*
                         Padding(
                           padding: EdgeInsets.only(bottom: 32),
-                          child: Text('1. 2019/02/28_22:23_Mark'),
+                          child: Text('1. 2019/02/28_Mark'),
                         ),
                         Padding(
                           padding: EdgeInsets.only(bottom: 32),
-                          child: Text('2. 2019/02/28_22:50_Suvi'),
+                          child: Text('2. 2019/02/28_Suvi'),
                         ),
                         Padding(
                           padding: EdgeInsets.only(bottom: 32),
-                          child: Text('3. 2019/02/28_23:00_Panda'),
+                          child: Text('3. 2019/02/28_Panda'),
                         ),
                         Padding(
                           padding: EdgeInsets.only(bottom: 32),
-                          child: Text('4. 2019/02/28_23:02_Lemon'),
+                          child: Text('4. 2019/02/28_Lemon'),
                         ),
                         Padding(
                           padding: EdgeInsets.only(bottom: 32),
-                          child: Text('5. 2019/02/28_23:07_Reese'),
+                          child: Text('5. 2019/02/28_Reese'),
                         ),
+                        */
+                        new Expanded(
+                            child: new ListView.builder(
+                                itemCount: LevelUpWidget.of(context).userfile.numrecords,
+                                itemBuilder: (BuildContext ctxt, int index) {
+                                  return new Text(LevelUpWidget.of(context).userfile.records[index].name);
+                                }))
                       ],
                     ),
                   ),
@@ -209,6 +292,7 @@ class _ConfirmationState extends State<Confirmation> {
                 RaisedButton(
                   child: Text('Add Record'),
                   onPressed: () {
+                    _createNewRecord(LevelUpWidget.of(context).userfile);
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => NewRecord()),
@@ -223,11 +307,8 @@ class _ConfirmationState extends State<Confirmation> {
                   child: RaisedButton(
                     child: Text('Send & Logout'),
                     onPressed: () {
-                      _saveRecord();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LogOut()),
-                      );
+                      _saveRecord(LevelUpWidget.of(context).userfile);
+                      _showDialog();
                     },
                   ),
                 ),

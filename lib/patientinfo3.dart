@@ -1,10 +1,11 @@
 import 'dart:io';
-
+import 'main.dart';
 import 'package:flutter/material.dart';
 import 'helppatientinfo3.dart';
 import 'confirmation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
+import 'userfile.dart';
 
 class PatientInfo3 extends StatefulWidget {
   @override
@@ -29,6 +30,14 @@ class _PatientInfo3State extends State<PatientInfo3> {
     prefs.setString('additional-info2', additionalinfo2Controller.text);
   }
 
+  void _savePatientInfo3(UserFile userfile) {
+    userfile.records[userfile.numrecords-1].wound = wound;
+    userfile.records[userfile.numrecords-1].mentalissues = mentalissues;
+    userfile.records[userfile.numrecords-1].previousmedicalrecords = pastmedrecords;
+    userfile.records[userfile.numrecords-1].additionalinfo2 = additionalinfo2;
+    
+  }
+
   File _image;
 
   String wound;
@@ -38,23 +47,23 @@ class _PatientInfo3State extends State<PatientInfo3> {
 
   int numfiles = 0;
 
-    Future _takePicture() async{
+  Future _takePicture() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
 
-    setState((){
+    setState(() {
       _image = image;
     });
   }
 
-  Future _selectPicture() async{
+  Future _selectPicture() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
-    setState((){
+    setState(() {
       _image = image;
     });
   }
 
-  Future<Null> _uploadPicture() async{
+  Future<Null> _uploadPicture() async {
     /*
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
 
@@ -65,17 +74,16 @@ class _PatientInfo3State extends State<PatientInfo3> {
     */
   }
 
-  void _selectAndUploadPicture() async{
+  void _selectAndUploadPicture() async {
     await _selectPicture();
     await _uploadPicture();
     numfiles++;
   }
 
-  void _takeAndUploadPicture() async{
+  void _takeAndUploadPicture() async {
     await _takePicture();
     await _uploadPicture();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +174,7 @@ class _PatientInfo3State extends State<PatientInfo3> {
                       controller: additionalinfo2Controller,
                       onChanged: (text) {
                         additionalinfo2 = text;
-                     },
+                      },
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                           labelText: '',
@@ -179,12 +187,12 @@ class _PatientInfo3State extends State<PatientInfo3> {
                 Row(
                   children: <Widget>[
                     Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 28),
+                      padding: EdgeInsets.only(left: 24, bottom: 5),
                       child: Text('Additional Files/Photos',
                           style: TextStyle(fontSize: 16)),
                     ),
                     IconButton(
+                      alignment: Alignment.centerRight,
                       icon: Icon(Icons.photo_camera),
                       color: Colors.black,
                       onPressed: () {
@@ -192,23 +200,35 @@ class _PatientInfo3State extends State<PatientInfo3> {
                       },
                     ),
                     IconButton(
+                      alignment: Alignment.centerRight,
                       icon: Icon(Icons.attach_file),
                       color: Colors.black,
                       onPressed: () {
-                         _selectAndUploadPicture();
+                        _selectAndUploadPicture();
                       },
                     ),
-                    Text('$numfiles/5'),
                   ],
                 ),
-                Padding(
-                  padding: EdgeInsets.only(left: 28, bottom: 20),
-                  child: SizedBox(
-                    width: 80,
-                    child: Text(
-                        'You can upload up to 5 photos/files from your phone',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(left: 28, bottom: 20),
+                      child: SizedBox(
+                        width: 80,
+                        child: Text(
+                            'You can upload up to 5 photos/files from your phone',
+                            style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 24),
+                        child: Text('$numfiles/5'),
+                      ),
+                    ),
+                  ],
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
@@ -219,7 +239,7 @@ class _PatientInfo3State extends State<PatientInfo3> {
                         context,
                         MaterialPageRoute(builder: (context) => Confirmation()),
                       );
-                      _persistPatientInfo3();
+                      _savePatientInfo3(LevelUpWidget.of(context).userfile);
                     },
                   ),
                 ),

@@ -4,6 +4,8 @@ import 'patientinfo3.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'patientinfo1.dart';
+import 'userfile.dart';
+import 'main.dart';
 
 class PatientInfo2 extends StatefulWidget {
   @override
@@ -16,14 +18,14 @@ class _PatientInfo2State extends State<PatientInfo2> {
     FocusScope.of(context).requestFocus(new FocusNode());
   }
 
-  bool good_appetite = false;
-  bool good_sleep = false;
-  bool do_exercise = false;
-  bool have_routine = false;
-  bool have_livingcompany = false;
-  bool good_mood = false;
-  bool good_bowelmovement = false;
-  bool manage_disease = false;
+  bool appetite_problems;
+  bool sleep_problems;
+  bool weight_problems;
+  bool no_routine;
+  bool lives_alone;
+  bool mood_problems;
+  bool constipation;
+  bool untreated_disease;
   bool _smoking = false;
   bool _alcohol = false;
   bool _drugs = false;
@@ -50,14 +52,14 @@ class _PatientInfo2State extends State<PatientInfo2> {
 
   _persistPatientInfo2() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('good_appetite', good_appetite);
-    prefs.setBool('good_sleep', good_sleep);
-    prefs.setBool('do_exercise', do_exercise);
-    prefs.setBool('have_routine', have_routine);
-    prefs.setBool('have_livingcompany', have_livingcompany);
-    prefs.setBool('good_mood', good_mood);
-    prefs.setBool('good_bowelmovement', good_bowelmovement);
-    prefs.setBool('manage_disease', manage_disease);
+    prefs.setBool('appetite_problems', appetite_problems);
+    prefs.setBool('sleep_problems', sleep_problems);
+    prefs.setBool('weight_problems', weight_problems);
+    prefs.setBool('no_routine', no_routine);
+    prefs.setBool('lives_alone', lives_alone);
+    prefs.setBool('mood_problems', mood_problems);
+    prefs.setBool('constipation', constipation);
+    prefs.setBool('untreated_disease', untreated_disease);
 
     prefs.setString('heart-rate', heartrate);
     prefs.setString('blood-pressure', bloodpressure);
@@ -70,6 +72,20 @@ class _PatientInfo2State extends State<PatientInfo2> {
     prefs.setBool('alcohol', _alcohol);
     prefs.setBool('drugs', _drugs);
     prefs.setString('additional-info1', additionalinfo1);
+  }
+
+  void _savePatientInfo2(UserFile userfile) {
+    userfile.records[userfile.numrecords-1].heartrate = heartrate;
+    userfile.records[userfile.numrecords-1].bloodpressure = bloodpressure;
+    userfile.records[userfile.numrecords-1].bloodglucose = bloodglucose;
+    userfile.records[userfile.numrecords-1].bodyheight = bodyheight;
+    userfile.records[userfile.numrecords-1].bodyweight = bodyweight;
+    userfile.records[userfile.numrecords-1].bmi = bmi;
+    userfile.records[userfile.numrecords-1].respirationrate = respirationrate;
+    userfile.records[userfile.numrecords-1].smoking = _smoking;
+    userfile.records[userfile.numrecords-1].alcohol = _alcohol;
+    userfile.records[userfile.numrecords-1].drugs = _drugs;
+    userfile.records[userfile.numrecords-1].additionalinfo1 = additionalinfo1;
   }
 
   Widget build(BuildContext context) {
@@ -92,6 +108,7 @@ class _PatientInfo2State extends State<PatientInfo2> {
             onTap: () => _dismissKeyboard(),
             child: Column(
               children: <Widget>[
+                /*
                 Padding(
                   padding: EdgeInsets.only(top: 24, left: 24, right: 24),
                   child: Row(
@@ -112,6 +129,74 @@ class _PatientInfo2State extends State<PatientInfo2> {
                       SizedBox(
                         width: (MediaQuery.of(context).size.width * 0.8) / 4,
                         child: Image.asset('assets/images/Slide4.PNG'),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 24, left: 24, right: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("appetite problems"),
+                      new Checkbox(
+                        value: appetite_problems,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            appetite_problems = newValue;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 24, left: 24, right: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("sleep problems"),
+                      new Checkbox(
+                        value: sleep_problems,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            sleep_problems = newValue;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 24, left: 24, right: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("body weight problems"),
+                      new Checkbox(
+                        value: weight_problems,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            weight_problems = newValue;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 0, left: 24, right: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("no daily routine"),
+                      new Checkbox(
+                        value: no_routine,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            no_routine = newValue;
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -161,6 +246,74 @@ class _PatientInfo2State extends State<PatientInfo2> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
+                      Text("lives alone"),
+                      new Checkbox(
+                        value: lives_alone,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            lives_alone = newValue;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 24, left: 24, right: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("mood or mental problems"),
+                      new Checkbox(
+                        value: mood_problems,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            mood_problems = newValue;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 24, left: 24, right: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("constipation"),
+                      new Checkbox(
+                        value: constipation,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            constipation = newValue;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 24, left: 24, right: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("untreated disease"),
+                      new Checkbox(
+                        value: untreated_disease,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            untreated_disease = newValue;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 24, left: 24, right: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
                       SizedBox(
                         width: (MediaQuery.of(context).size.width * 0.8) / 4,
                         child: Image.asset('assets/images/Slide5.PNG'),
@@ -180,6 +333,7 @@ class _PatientInfo2State extends State<PatientInfo2> {
                     ],
                   ),
                 ),
+                
                 Padding(
                   padding: EdgeInsets.only(left: 10, right: 10),
                   child: Row(
@@ -220,6 +374,7 @@ class _PatientInfo2State extends State<PatientInfo2> {
                     ],
                   ),
                 ),
+                */
                 Padding(
                   padding:
                       EdgeInsets.only(left: 24, right: 24, top: 20, bottom: 5),
@@ -331,32 +486,44 @@ class _PatientInfo2State extends State<PatientInfo2> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      Text('Smoking', style: TextStyle(fontSize: 16)),
-                      new Checkbox(
-                        value: _smoking,
-                        onChanged: (bool newValue) {
-                          setState(() {
-                            _smoking = newValue;
-                          });
-                        },
+                      Column(
+                        children: <Widget>[
+                          Text('Smoking', style: TextStyle(fontSize: 16)),
+                          new Checkbox(
+                            value: _smoking,
+                            onChanged: (bool newValue) {
+                              setState(() {
+                                _smoking = newValue;
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                      Text('Alcohol', style: TextStyle(fontSize: 16)),
-                      new Checkbox(
-                        value: _alcohol,
-                        onChanged: (bool newValue) {
-                          setState(() {
-                            _alcohol = newValue;
-                          });
-                        },
+                      Column(
+                        children: <Widget>[
+                          Text('Alcohol', style: TextStyle(fontSize: 16)),
+                          new Checkbox(
+                            value: _alcohol,
+                            onChanged: (bool newValue) {
+                              setState(() {
+                                _alcohol = newValue;
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                      Text('Drugs', style: TextStyle(fontSize: 16)),
-                      new Checkbox(
-                        value: _drugs,
-                        onChanged: (bool newValue) {
-                          setState(() {
-                            _drugs = newValue;
-                          });
-                        },
+                      Column(
+                        children: <Widget>[
+                          Text('Drugs', style: TextStyle(fontSize: 16)),
+                          new Checkbox(
+                            value: _drugs,
+                            onChanged: (bool newValue) {
+                              setState(() {
+                                _drugs = newValue;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -390,7 +557,8 @@ class _PatientInfo2State extends State<PatientInfo2> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => PatientInfo1()),
+                          MaterialPageRoute(
+                              builder: (context) => PatientInfo1()),
                         );
                       },
                     ),
@@ -403,7 +571,7 @@ class _PatientInfo2State extends State<PatientInfo2> {
                           MaterialPageRoute(
                               builder: (context) => PatientInfo3()),
                         );
-                        _persistPatientInfo2();
+                        _savePatientInfo2(LevelUpWidget.of(context).userfile);
                       },
                     ),
                   ],

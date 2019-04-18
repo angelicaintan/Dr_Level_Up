@@ -15,27 +15,27 @@ class _LogOutState extends State<LogOut> {
       appBar: AppBar(
         leading: new Container(),
       ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        child: Column(
+      body: ListView(
+        children: <Widget> [
+          Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 30),
+              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 20),
               child: Text('You have logged out from our system.',
               style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 30),
+              padding: EdgeInsets.only(bottom: 24, left: 24, right: 24),
               child: Text('Thank you for your contribution! By filling out these forms, you help us save time and effort to organise the records. We hope we will meet you again soon!',
               style: TextStyle(fontSize: 18), textAlign: TextAlign.center
               ),
             ),
              Padding(
-              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 30),
-              child: Image.asset('assets/images/icon@2x.png'),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+              child: Image.asset('assets/images/icon@2x.png', height: 150),
             ),
             RaisedButton(
               child: Text(
@@ -50,6 +50,7 @@ class _LogOutState extends State<LogOut> {
             ),
           ],
         ),
+        ],
       )
     );
   }

@@ -4,15 +4,25 @@ import 'helppatientinfo1.dart';
 import 'helpnewrecord.dart';
 import 'Location.dart';
 import 'main.dart';
+import 'userfile.dart';
 
 class NewRecord extends StatefulWidget {
   @override
   _NewRecordState createState() => _NewRecordState();
 }
 
+void _createNewRecord (UserFile userfile) {
+    Record temp = new Record('n/a','n/a','n/a','n/a','n/a','n/a', false, 'n/a', 'n/a', false, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', false, false, false, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a');
+    // userfile.records.add(temp);
+    // ++userfile.numrecords;
+    
+}
+
+
 class _NewRecordState extends State<NewRecord> {
   @override
   Widget build(BuildContext context) {
+    print(LevelUpWidget.of(context).userfile.accesscode);
     return Scaffold(
         appBar: AppBar(actions: <Widget>[
           FlatButton(
@@ -70,6 +80,7 @@ class _NewRecordState extends State<NewRecord> {
                       context,
                       MaterialPageRoute(builder: (context) => Location()),
                     );
+                    _createNewRecord(LevelUpWidget.of(context).userfile);
                   },
                 ),
               ),

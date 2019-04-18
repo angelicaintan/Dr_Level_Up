@@ -4,10 +4,42 @@ import 'helpmain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'translations.dart';
+import 'application.dart';
+import 'dart:io';
+import 'userfile.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => new _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+    SpecificLocalizationDelegate _localeOverrideDelegate;
+
+    @override
+    void initState(){
+    super.initState();
+    _localeOverrideDelegate = new SpecificLocalizationDelegate(null);
+    ///
+    /// Let's save a pointer to this method, should the user wants to change its language
+    /// We would then call: applic.onLocaleChanged(new Locale('en',''));
+    /// 
+    applic.onLocaleChanged = onLocaleChange;
+  }
+
+    onLocaleChange(Locale locale){
+    setState((){
+      _localeOverrideDelegate = new SpecificLocalizationDelegate(locale);
+    });
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -25,17 +57,29 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.red,
       ),
-      home: LevelUpWidget(records: [], child: MyHomePage(title: 'Salvation Army')),
+      localizationsDelegates: [
+        const TranslationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+          const Locale('en', ''),
+          const Locale('hk', ''),
+      ],
+      home: LevelUpWidget(userfile: UserFile('n/a', 'n/a', 'n/a'), child: MyHomePage(title: 'Salvation Army')),
     );
   }
 }
 
 class LevelUpWidget extends InheritedWidget {
-  List records;
+  UserFile userfile = new UserFile('n/a', 'n/a', 'n/a');
 
-  LevelUpWidget({this.records, Widget child}) : super(child: child);
+  LevelUpWidget({this.userfile, Widget child}) : super(child: child);
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) => true;
+
+  static LevelUpWidget of (BuildContext context) =>
+    context.inheritFromWidgetOfExactType(LevelUpWidget);
 }
 
 class MyHomePage extends StatefulWidget {
@@ -53,23 +97,24 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() => new _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   void _dismissKeyboard() {
     FocusScope.of(context).requestFocus(new FocusNode());
   }
 
-  String username;
-  String email;
-  String accesscode;
+  String username = 'n/a';
+  String email = 'n/a';
+  String accesscode = 'n/a';
   int test;
 
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final accesscodeController = TextEditingController();
-
+  
   var records = Firestore.instance.collection('Records').document();
 
   _persistLogin() async {
@@ -79,17 +124,36 @@ class _MyHomePageState extends State<MyHomePage> {
     prefs.setString('user-contact', email);
   }
 
-  Future<Null> _saveLogin() async {
+  void _saveLogin(UserFile userfile) async {
+
+    userfile.accesscode = accesscode;
+    userfile.username = username;
+    userfile.email = email;
+  }
+
+/*
+  _saveLogin(List records) async {
     Map<String, dynamic> loginMap = {
       'access-code': '${accesscodeController.text}',
       'user-name': '${usernameController.text}',
       'user-contact': '${emailController.text}',
     };
     records.setData(loginMap);
+    records.add(records)
+
+    records.add(accesscode);
+    records.add(username);
+    records.add(email);
+
   }
+  */
+
+
 
   @override
   Widget build(BuildContext context) {
+
+   
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -100,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
             // Here we take the value from the MyHomePage object that was created by
             // the App.build method, and use it to set our appbar title.
-            title: Text('Welcome'),
+            title: Text(Translations.of(context).text('welcome')),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.help_outline, size: 29),
@@ -111,6 +175,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     MaterialPageRoute(builder: (context) => HelpMain()),
                   );
                 },
+              ),
+              FlatButton (
+                child: Text("EN/中文"),
+                onPressed: () { 
+                  applic.onLocaleChanged(new Locale('hk', null)); },
               ),
             ]),
         body: ListView(children: <Widget>[
@@ -129,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                        labelText: 'Access Code',
+                        labelText: Translations.of(context).text('access_code'),
                         labelStyle: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20),
                         border: OutlineInputBorder(
@@ -176,12 +245,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     'Go!',
                   ),
                   onPressed: () {
+                    _saveLogin(LevelUpWidget.of(context).userfile);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => NewRecord()),
+                      MaterialPageRoute(builder: (context) {
+                        return LevelUpWidget(
+                          userfile: LevelUpWidget.of(context).userfile,
+                          child: NewRecord(),
+                        );
+                      }),
                     );
-                    _persistLogin();
-                    // _saveLogin();
+                    // _persistLogin();
                   },
                 ),
                 Padding(
